@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, Loader2, User, Image as ImageIcon } from 'lucide-react';
+import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, Loader2, User } from 'lucide-react';
 import type { Task } from '../store/useStore';
 import { cn } from '../lib/utils';
 

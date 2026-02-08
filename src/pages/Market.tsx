@@ -2,7 +2,7 @@ import { useStore } from '../store/useStore';
 import { motion } from 'framer-motion';
 import { Gamepad2, Smartphone, Utensils, Sparkles, History } from 'lucide-react';
 import { savePurchase, saveTransaction, getPurchases } from '../lib/storage';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const items = [
   { id: 1, name: '游戏时间 30分钟', cost: 100, icon: Gamepad2, color: 'text-purple-400', bg: 'bg-purple-500/10' },
@@ -68,7 +68,7 @@ export function Market() {
             <p className="text-slate-500 text-sm">暂无兑换记录</p>
           ) : (
             <div className="space-y-2 max-h-[200px] overflow-y-auto">
-              {purchases.slice(0, 10).map(p => (
+              {purchases.slice(0, 10).map((p: any) => (
                 <div key={p.id} className="flex justify-between items-center text-sm bg-space-800/50 p-2 rounded-lg">
                   <span className="text-slate-300">{p.name}</span>
                   <div className="text-right">

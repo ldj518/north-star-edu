@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { History, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { History as HistoryIcon, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { getTransactions, getTaskHistory, getStats } from '../lib/storage';
 
 export function History() {
@@ -20,7 +20,7 @@ export function History() {
       {/* Header */}
       <div>
         <h2 className="text-2xl lg:text-3xl font-bold mb-2 flex items-center gap-3">
-          <History className="w-6 h-6 lg:w-8 lg:h-8" />
+          <HistoryIcon className="w-6 h-6 lg:w-8 lg:h-8" />
           历史记录
         </h2>
         <p className="text-slate-400">查看你的所有活动和成就</p>

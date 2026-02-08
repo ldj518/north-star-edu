@@ -16,8 +16,6 @@ export function Focus() {
   const [elapsed, setElapsed] = useState(0);
   const [showGhost, setShowGhost] = useState(false);
   const [showSubmission, setShowSubmission] = useState(false);
-  const [ghostQuestion, setGhostQuestion] = useState('');
-  const [ghostAnswer, setGhostAnswer] = useState('');
 
   // Auto-start if task is active
   useEffect(() => {
@@ -43,19 +41,11 @@ export function Focus() {
   }, [isActive, elapsed]);
 
   const generateGhostCheck = () => {
-    const questions = [
-      { q: '当前任务名称是什么？', type: 'task' },
-      { q: '3 + 5 = ?', type: 'math', answer: '8' },
-      { q: '现在是上午还是下午？', type: 'time' },
-      { q: '继续还是放弃？', type: 'choice' }
-    ];
-    const selected = questions[Math.floor(Math.random() * questions.length)];
-    setGhostQuestion(selected.q);
     setShowGhost(true);
     setIsActive(false);
   };
 
-  const handleGhostAnswer = () => {
+  const handleGhostSuccess = () => {
     setShowGhost(false);
     addReward(20); // Ghost check bonus
     saveTransaction({

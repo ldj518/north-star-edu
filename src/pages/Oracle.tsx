@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Camera, Send, Bot, User, Check, Loader2 } from 'lucide-react';
+import { Upload, Camera, Send, Bot, User, Check, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useOracle } from '../lib/oracle-api';
 
@@ -8,6 +8,7 @@ export function Oracle() {
   const { messages, isAnalyzing, sendMessage } = useOracle();
   const [inputText, setInputText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = () => {
     if (!inputText.trim() && !selectedImage) return;
@@ -26,6 +27,10 @@ export function Oracle() {
       setSelectedImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
   };
 
   return (
@@ -119,9 +124,27 @@ export function Oracle() {
 
         {/* Input Area */}
         <div className="p-4 bg-space-900 border-t border-space-800">
+          {selectedImage && (
+            <div className="mb-3 relative inline-block">
+              <img src={selectedImage} alt="Upload" className="max-h-32 rounded-lg" />
+              <button 
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           <div className="flex gap-2">
+            <input 
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
             <button 
-              onClick={handleUpload}
+              onClick={() => fileInputRef.current?.click()}
               className="p-3 rounded-xl bg-space-800 hover:bg-space-700 text-slate-400 hover:text-white transition-colors border border-space-700"
             >
               <Upload className="w-5 h-5" />
@@ -131,10 +154,16 @@ export function Oracle() {
             </button>
             <input 
               type="text" 
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="输入你的问题..." 
               className="flex-1 bg-space-950 border border-space-800 rounded-xl px-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-neon-purple transition-colors"
             />
-            <button className="p-3 rounded-xl bg-neon-purple hover:bg-neon-purple/80 text-white transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+            <button 
+              onClick={handleSend}
+              className="p-3 rounded-xl bg-neon-purple hover:bg-neon-purple/80 text-white transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+            >
               <Send className="w-5 h-5" />
             </button>
           </div>
