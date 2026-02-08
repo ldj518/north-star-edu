@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, X, Sparkles, MessageSquare, Sword, Zap, ExternalLink } from 'lucide-react';
+import { Bot, X, ExternalLink } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 

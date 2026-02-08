@@ -1,7 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Sword, Skull, Calendar, Target } from 'lucide-react';
-import { useStore } from '../store/useStore';
+import { Sword, Skull, Calendar } from 'lucide-react';
 
 export function BossBattleCard() {
   // Mock Boss Data

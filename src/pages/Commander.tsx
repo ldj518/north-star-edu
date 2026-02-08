@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { 
@@ -7,11 +7,8 @@ import {
   Gavel, 
   Settings, 
   CheckCircle2, 
-  XCircle, 
-  AlertOctagon,
+  XCircle,
   Award,
-  Clock,
-  ChevronRight,
   Save,
   History,
   Coins,
@@ -82,7 +79,7 @@ export function Commander() {
 }
 
 function FamilyPanel() {
-  const { users, currentUser, addUser, updateUser, deleteUser } = useStore();
+  const { users, currentUser, addUser } = useStore();
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Filter students linked to this parent

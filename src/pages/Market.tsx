@@ -1,7 +1,6 @@
-import React from 'react';
 import { useStore } from '../store/useStore';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Gamepad2, Smartphone, Utensils, Sparkles } from 'lucide-react';
+import { Gamepad2, Smartphone, Utensils, Sparkles } from 'lucide-react';
 
 const items = [
   { id: 1, name: '游戏时间 30分钟', cost: 100, icon: Gamepad2, color: 'text-purple-400', bg: 'bg-purple-500/10' },

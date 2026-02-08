@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import type { Task } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar as CalendarIcon, GripVertical, Plus, UserCircle, X } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, UserCircle, X } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { TaskSubmission } from '../components/TaskSubmission';
 import { useNavigate } from 'react-router-dom';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export function Missions() {
-  const { tasks, addTask, currentUser, setActiveTask, moveTask, addCoins } = useStore();
+  const { tasks, addTask, currentUser, setActiveTask } = useStore();
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [submittingTask, setSubmittingTask] = useState<Task | null>(null);
 
   // Derive schedule from store tasks
   // In a real app, this filtering would be more robust

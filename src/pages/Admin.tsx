@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Users, UserPlus, Shield, Activity, Trash2, Lock, Key } from 'lucide-react';
+import { useState } from 'react';
 import { useStore } from '../store/useStore';
-import type { User } from '../store/useStore';
+import { UserPlus, Shield, Activity, Trash2, Lock } from 'lucide-react';
 
 export function AdminDashboard() {
   const { users, addUser, updateUser, deleteUser } = useStore();

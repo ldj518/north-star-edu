@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -6,7 +5,6 @@ import {
   Target, 
   Sparkles, // Galaxy
   Users,    // Squad
-  Menu
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Square, Eye, AlertCircle, Timer as TimerIcon, Zap, CheckCircle2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
@@ -6,7 +6,7 @@ import { TaskSubmission } from '../components/TaskSubmission';
 import { useNavigate } from 'react-router-dom';
 
 export function Focus() {
-  const { activeTaskId, tasks, moveTask, addCoins, setActiveTask } = useStore();
+  const { activeTaskId, tasks, moveTask, setActiveTask } = useStore();
   const navigate = useNavigate();
   
   const currentTask = tasks.find(t => t.id === activeTaskId);

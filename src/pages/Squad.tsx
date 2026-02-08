@@ -1,6 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Users, Trophy, Swords, Crown, Shield, Zap, Target } from 'lucide-react';
+import { Users, Trophy, Swords, Shield, Zap } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 const leaderboard = [
   { id: 1, name: 'CyberWolf', score: 15400, rank: 1, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Wolf' },

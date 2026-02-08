@@ -1,12 +1,8 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import {
-  TrendingUp,
-  TrendingDown,
   AlertTriangle,
   Target, 
-  Brain, 
-  ArrowRight,
+  Brain,
   Activity,
   Zap
 } from 'lucide-react';
@@ -18,9 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
-  AreaChart,
-  Area
+  ReferenceLine
 } from 'recharts';
 
 const predictionData = [

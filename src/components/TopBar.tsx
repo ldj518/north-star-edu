@@ -1,4 +1,3 @@
-import React from 'react';
 import { useStore } from '../store/useStore';
 import { Coins, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';

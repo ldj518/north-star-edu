@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Lock, CheckCircle2, ChevronRight, Zap, BookOpen } from 'lucide-react';
+import { Star, Lock, ChevronRight, Zap, BookOpen, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 // Mock Knowledge Graph

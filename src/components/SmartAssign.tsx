@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Bot, 
-  FileText, 
   Image as ImageIcon, 
   Mic, 
   Plus, 

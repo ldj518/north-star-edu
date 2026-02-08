@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, RefreshCw, Trash2, CheckCircle, Share2, Download, X } from 'lucide-react';
+import { Brain, RefreshCw, CheckCircle, Share2, Download, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const mistakes = [

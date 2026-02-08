@@ -1,4 +1,3 @@
-import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
 import { useStore } from '../store/useStore';
 import { motion } from 'framer-motion';

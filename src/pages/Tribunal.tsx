@@ -1,22 +1,15 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   AlertTriangle, 
   Gavel, 
-  MessageSquare, 
-  History, 
-  X, 
-  Check, 
-  Repeat,
+  History,
+  Check,
   Star,
-  Award,
-  ThumbsUp,
-  Heart,
   Medal,
   Crown,
   Lock,
   Zap,
-  BookOpen,
   Sunrise,
   Coins
 } from 'lucide-react';
@@ -26,15 +19,6 @@ import { cn } from '../lib/utils';
 const infractions = [
   { id: 1, title: '玩手机超时', date: '2026-02-05', cost: -50, reason: '约定1小时，实际使用1.5小时', repeatCount: 3, status: 'appealing', appealMsg: '我看错时间了，下次一定注意...' },
   { id: 2, title: '作业字迹潦草', date: '2026-02-03', cost: -20, reason: '英语抄写像鬼画符', repeatCount: 1, status: 'closed' },
-];
-
-// New Rank System
-const ranks = [
-  { lvl: 1, title: '新兵', exp: 0, icon: '🛡️' },
-  { lvl: 10, title: '士官长', exp: 1000, icon: '⚔️' },
-  { lvl: 20, title: '少尉', exp: 5000, icon: '🦅' },
-  { lvl: 35, title: '上校', exp: 15000, icon: '🦁' },
-  { lvl: 50, title: '元帅', exp: 50000, icon: '👑' },
 ];
 
 // Expanded Achievements

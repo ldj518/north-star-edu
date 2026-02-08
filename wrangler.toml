@@ -1,0 +1,15 @@
+name = "north-star-edu"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+# Environment Variables (set in Cloudflare Dashboard)
+# GLM_API_KEY = "your-glm-api-key"
+
+[build]
+command = "npm run build"
+
+# D1 Database binding (optional, for future use)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "north-star-edu-db"
+# database_id = "your-database-id"

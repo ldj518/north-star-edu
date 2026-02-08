@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Camera, Send, Bot, User, Check, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Upload, Camera, Send, Bot, User, Check } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 // Simulated Chat Types

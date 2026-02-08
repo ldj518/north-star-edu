@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, ShieldCheck, User, LogIn, Lock } from 'lucide-react';
+import { Rocket, ShieldCheck, User, Lock } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 

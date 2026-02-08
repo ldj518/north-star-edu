@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Target, Gift, Lock, Moon, Sun, Send, StickyNote, Plus, Trash2, Save } from 'lucide-react';
+import { Target, Gift, Lock, Moon, Sun, Send, StickyNote, Plus } from 'lucide-react';
 
 export function Strategy() {
   const [curfewStart, setCurfewStart] = useState('22:00');
   const [curfewEnd, setCurfewEnd] = useState('06:00');
   const [message, setMessage] = useState('');
   
-  const [goals, setGoals] = useState([
+  const [goals] = useState([
     { id: 1, title: '期末英语突击', target: '90分', current: '82分', progress: 60, reward: 'Switch 游戏任选一款', deadline: '2026-06-30' },
     { id: 2, title: '体能达标', target: '跳绳 180个/分', current: '140个/分', progress: 45, reward: '新球鞋一双', deadline: '2026-05-01' },
   ]);

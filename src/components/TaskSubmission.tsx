@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, Loader2, ArrowRight } from 'lucide-react';
-import { useStore } from '../store/useStore';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, Loader2, User } from 'lucide-react';
 import type { Task } from '../store/useStore';
 import { cn } from '../lib/utils';
 
@@ -314,7 +313,6 @@ function SuccessStep({ task, onClose }: { task: Task, onClose: () => void }) {
       <motion.div 
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        type="spring"
         className="w-24 h-24 bg-neon-green rounded-full flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(34,197,94,0.5)]"
       >
         <CheckCircle2 className="w-12 h-12 text-space-950" />

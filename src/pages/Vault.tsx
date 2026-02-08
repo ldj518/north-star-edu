@@ -1,7 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Camera, Ruler, Weight, History, FileText, Download } from 'lucide-react';
+import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { Camera, Ruler, Weight, History, Download } from 'lucide-react';
 
 const growthData = [
   { month: 'Sep', height: 162, weight: 48 },

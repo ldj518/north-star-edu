@@ -1,13 +1,9 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Trophy, 
   TrendingUp, 
   TrendingDown, 
   Minus, 
   BookOpen, 
-  Users, 
-  Target,
   Crown,
   Sparkles
 } from 'lucide-react';
@@ -18,10 +14,7 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar, 
-  Cell
+  ResponsiveContainer
 } from 'recharts';
 
 // Mock Data: Recent Exams
