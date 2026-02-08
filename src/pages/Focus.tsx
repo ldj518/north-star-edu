@@ -4,18 +4,20 @@ import { Play, Pause, Square, Eye, AlertCircle, Timer as TimerIcon, Zap, CheckCi
 import { useStore } from '../store/useStore';
 import { TaskSubmission } from '../components/TaskSubmission';
 import { useNavigate } from 'react-router-dom';
+import { saveTaskHistory, saveTransaction } from '../lib/storage';
 
 export function Focus() {
-  const { activeTaskId, tasks, moveTask, setActiveTask } = useStore();
+  const { activeTaskId, tasks, moveTask, setActiveTask, addCoins: addReward } = useStore();
   const navigate = useNavigate();
   
   const currentTask = tasks.find(t => t.id === activeTaskId);
   
   const [isActive, setIsActive] = useState(false);
-  const [elapsed, setElapsed] = useState(0); // Elapsed time in seconds
+  const [elapsed, setElapsed] = useState(0);
   const [showGhost, setShowGhost] = useState(false);
   const [showSubmission, setShowSubmission] = useState(false);
-  const { addCoins: addReward } = useStore();
+  const [ghostQuestion, setGhostQuestion] = useState('');
+  const [ghostAnswer, setGhostAnswer] = useState('');
 
   // Auto-start if task is active
   useEffect(() => {
@@ -31,15 +33,41 @@ export function Focus() {
       interval = setInterval(() => {
         setElapsed((prev) => prev + 1);
         
-        // Random Ghost Check (simulated) - lower prob for demo
-        if (Math.random() < 0.002) { 
-          setShowGhost(true);
-          setIsActive(false); // Pause timer
+        // Real Ghost Check - every 10-20 minutes randomly
+        if (elapsed > 0 && elapsed % (5 * 60) === 0 && Math.random() < 0.3) {
+          generateGhostCheck();
         }
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isActive]);
+  }, [isActive, elapsed]);
+
+  const generateGhostCheck = () => {
+    const questions = [
+      { q: '当前任务名称是什么？', type: 'task' },
+      { q: '3 + 5 = ?', type: 'math', answer: '8' },
+      { q: '现在是上午还是下午？', type: 'time' },
+      { q: '继续还是放弃？', type: 'choice' }
+    ];
+    const selected = questions[Math.floor(Math.random() * questions.length)];
+    setGhostQuestion(selected.q);
+    setShowGhost(true);
+    setIsActive(false);
+  };
+
+  const handleGhostAnswer = () => {
+    setShowGhost(false);
+    addReward(20); // Ghost check bonus
+    saveTransaction({
+      id: Date.now().toString(),
+      type: 'earn',
+      amount: 20,
+      description: 'Ghost Check 验证成功',
+      timestamp: new Date(),
+      category: 'focus'
+    });
+    setIsActive(true);
+  };
 
   const toggleTimer = () => setIsActive(!isActive);
   
@@ -49,42 +77,70 @@ export function Focus() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleGhostSuccess = () => {
-    setShowGhost(false);
-    addReward(20);
-    setIsActive(true); // Resume
-  };
-
   const handleFinish = () => {
     setIsActive(false);
-    // Open submission modal
     setShowSubmission(true);
   };
   
   const handleTaskComplete = () => {
     if (currentTask) {
-        moveTask(currentTask.id, 'done');
-        addReward(currentTask.reward + Math.floor(elapsed / 60)); // Reward + Time bonus
-        setActiveTask(null);
+      const timeBonus = Math.floor(elapsed / 60) * 2; // 2 coins per minute
+      const totalReward = currentTask.reward + timeBonus;
+      
+      // Move task
+      moveTask(currentTask.id, 'done');
+      
+      // Add reward
+      addReward(totalReward);
+      
+      // Save transaction
+      saveTransaction({
+        id: Date.now().toString(),
+        type: 'earn',
+        amount: totalReward,
+        description: `完成：${currentTask.title}`,
+        timestamp: new Date(),
+        category: 'task'
+      });
+      
+      // Save task history
+      saveTaskHistory({
+        id: Date.now().toString(),
+        taskId: currentTask.id,
+        taskName: currentTask.title,
+        status: 'completed',
+        duration: elapsed,
+        reward: totalReward,
+        timestamp: new Date()
+      });
+      
+      setActiveTask(null);
     }
     setShowSubmission(false);
-    navigate('/missions'); // Go back to missions
+    navigate('/missions');
   };
   
   const handleStop = () => {
-      setIsActive(false);
-      if (confirm('确定要放弃当前专注吗？进度将不会保存。')) {
-          setActiveTask(null);
-          navigate('/missions');
+    setIsActive(false);
+    if (confirm('确定要放弃当前专注吗？进度将不会保存。')) {
+      if (currentTask) {
+        saveTaskHistory({
+          id: Date.now().toString(),
+          taskId: currentTask.id,
+          taskName: currentTask.title,
+          status: 'abandoned',
+          duration: elapsed,
+          reward: 0,
+          timestamp: new Date()
+        });
       }
+      setActiveTask(null);
+      navigate('/missions');
+    }
   };
 
-  // Mock comparison data
-  const avgTime = currentTask ? currentTask.duration * 60 : 1800; // Expected duration in seconds
+  const avgTime = currentTask ? currentTask.duration * 60 : 1800;
   const progressPercent = Math.min(100, (elapsed / avgTime) * 100);
-  
-  // Ghost Racer calculation
-  // Assume "Yesterday" took 90% of expected time.
   const ghostProgress = Math.min(100, (elapsed / (avgTime * 0.9)) * 100); 
 
   if (!currentTask && !activeTaskId) {

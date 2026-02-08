@@ -1,46 +1,31 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Camera, Send, Bot, User, Check } from 'lucide-react';
+import { Upload, Camera, Send, Bot, User, Check, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
-
-// Simulated Chat Types
-type Message = {
-  id: string;
-  role: 'ai' | 'user';
-  content: string;
-  type?: 'text' | 'image' | 'analysis';
-};
+import { useOracle } from '../lib/oracle-api';
 
 export function Oracle() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'ai', content: '你好，路则昊！我是你的 AI 导师。遇到不会的题了吗？拍照发给我，我们一起找思路（记得：我不提供直接答案哦）。', type: 'text' }
-  ]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { messages, isAnalyzing, sendMessage } = useOracle();
+  const [inputText, setInputText] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleUpload = () => {
-    // Simulate upload
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: 'https://images.unsplash.com/photo-1664382953518-4a664ab8a8c9?w=800&auto=format&fit=crop&q=60', type: 'image' };
-    setMessages(prev => [...prev, userMsg]);
-    setIsAnalyzing(true);
+  const handleSend = () => {
+    if (!inputText.trim() && !selectedImage) return;
+    
+    sendMessage(inputText || '请帮我看看这道题', selectedImage || undefined);
+    setInputText('');
+    setSelectedImage(null);
+  };
 
-    // Simulate AI thinking and response
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setMessages(prev => [...prev, 
-        { 
-          id: Date.now().toString(), 
-          role: 'ai', 
-          content: '收到！正在分析这道英语阅读理解...', 
-          type: 'text' 
-        },
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'ai',
-          content: '我发现你在第 3 题选了 C。让我们回读一下第二段的第一句话："However, most people think..."。这里的 "However" 表明了什么逻辑关系？',
-          type: 'analysis'
-        }
-      ]);
-    }, 2500);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSelectedImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (

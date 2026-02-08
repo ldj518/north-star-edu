@@ -16,6 +16,7 @@ import { Galaxy } from './pages/Galaxy';
 import { Squad } from './pages/Squad';
 import { Nexus } from './pages/Nexus';
 import { Prophet } from './pages/Prophet';
+import { History } from './pages/History';
 import { useStore } from './store/useStore';
 
 // Protected Route Wrapper
@@ -56,6 +57,7 @@ function App() {
           <Route path="nexus" element={<Nexus />} />
           <Route path="galaxy" element={<Galaxy />} />
           <Route path="squad" element={<Squad />} />
+          <Route path="history" element={<History />} />
           <Route path="tribunal" element={<Tribunal />} />
           <Route path="vault" element={<Vault />} />
           <Route path="market" element={<Market />} />
