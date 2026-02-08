@@ -304,6 +304,7 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
 function AnalyzingStep({ image }: { image: string }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('初始化...');
+  const [usingDemo, setUsingDemo] = useState(false);
 
   useEffect(() => {
     const stages = [
@@ -322,6 +323,22 @@ function AnalyzingStep({ image }: { image: string }) {
         currentStage++;
       }
     }, 800);
+    
+    // Check if using demo mode (no API key configured)
+    const checkApiStatus = async () => {
+      try {
+        const response = await fetch('/api/health');
+        const data = await response.json();
+        if (!data.apiConfigured) {
+          setUsingDemo(true);
+        }
+      } catch (e) {
+        // Assume demo mode if health check fails
+        setUsingDemo(true);
+      }
+    };
+    
+    checkApiStatus();
     
     return () => clearInterval(interval);
   }, []);
@@ -352,9 +369,29 @@ function AnalyzingStep({ image }: { image: string }) {
           />
         </div>
         
-        <div className="text-sm text-slate-400">
+        <div className="text-sm text-slate-400 mb-4">
           进度: {progress}%
         </div>
+
+        {usingDemo && (
+          <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg max-w-md">
+            <div className="flex items-center gap-2 text-yellow-400 text-sm mb-2">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="font-medium">演示模式</span>
+            </div>
+            <p className="text-xs text-slate-400">
+              未检测到 API Key 配置，正在使用演示模式。
+            </p>
+            <a 
+              href="https://docs.openclaw.ai" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-neon-blue hover:underline mt-2 inline-block"
+            >
+              如何配置真实 AI →
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
