@@ -5,9 +5,6 @@ pages_build_output_dir = "dist"
 # Environment Variables (set in Cloudflare Dashboard)
 # GLM_API_KEY = "your-glm-api-key"
 
-[build]
-command = "npm run build"
-
 # D1 Database binding (optional, for future use)
 # [[d1_databases]]
 # binding = "DB"
