@@ -36,36 +36,37 @@ const subjects = [
 
 export function Academics() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
+          <h2 className="text-2xl lg:text-3xl font-bold mb-2 flex flex-wrap items-center gap-2 lg:gap-3">
             学业档案 Academics
-            <div className="px-3 py-1 rounded-full bg-neon-yellow/20 text-neon-yellow text-sm font-mono border border-neon-yellow/50 flex items-center gap-1">
-              <Crown className="w-4 h-4" />
-              Class Rank: 33 / 47
+            <div className="px-2 lg:px-3 py-1 rounded-full bg-neon-yellow/20 text-neon-yellow text-xs lg:text-sm font-mono border border-neon-yellow/50 flex items-center gap-1">
+              <Crown className="w-3 h-3 lg:w-4 lg:h-4" />
+              <span className="hidden sm:inline">Class Rank: 33 / 47</span>
+              <span className="sm:hidden">33/47</span>
             </div>
           </h2>
-          <p className="text-slate-400">每一次考试都是升级的契机，而非审判。</p>
+          <p className="text-slate-400 text-sm lg:text-base">每一次考试都是升级的契机，而非审判。</p>
         </div>
       </div>
 
       {/* Rank Trend Chart */}
-      <div className="bg-space-900/50 backdrop-blur-sm rounded-2xl border border-space-800 p-6 relative overflow-hidden">
+      <div className="bg-space-900/50 backdrop-blur-sm rounded-xl lg:rounded-2xl border border-space-800 p-4 lg:p-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/5 rounded-bl-full" />
-        <h3 className="font-bold text-white mb-6 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-neon-blue" />
+        <h3 className="font-bold text-white mb-4 lg:mb-6 flex items-center gap-2 text-base lg:text-lg">
+          <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-neon-blue" />
           排位晋升之路
         </h3>
-        <div className="h-[250px] w-full">
+        <div className="h-[200px] lg:h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={[...exams].reverse()}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="name" stroke="#64748b" tick={{fill: '#94a3b8'}} />
-              <YAxis reversed domain={[1, 47]} stroke="#64748b" tick={{fill: '#94a3b8'}} label={{ value: '排名 (越低越好)', angle: -90, position: 'insideLeft', fill: '#64748b' }} />
+              <XAxis dataKey="name" stroke="#64748b" tick={{fill: '#94a3b8'}} fontSize={12} />
+              <YAxis reversed domain={[1, 47]} stroke="#64748b" tick={{fill: '#94a3b8', fontSize: 12}} label={{ value: '排名', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 10 }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', fontSize: 12 }}
                 itemStyle={{ color: '#fff' }}
               />
               <Line 
@@ -79,67 +80,67 @@ export function Academics() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <p className="text-center text-xs text-slate-500 mt-2">✨ 目标：下学期进入前 25 名！</p>
+        <p className="text-center text-[10px] lg:text-xs text-slate-500 mt-2">✨ 目标：下学期进入前 25 名！</p>
       </div>
 
       {/* Subject Cards Grid */}
-      <h3 className="font-bold text-xl text-white mt-8 mb-4 flex items-center gap-2">
-        <BookOpen className="w-5 h-5 text-neon-purple" />
+      <h3 className="font-bold text-lg lg:text-xl text-white mt-6 lg:mt-8 mb-3 lg:mb-4 flex items-center gap-2">
+        <BookOpen className="w-4 h-4 lg:w-5 lg:h-5 text-neon-purple" />
         学科战力分析 (期末考)
       </h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
         {subjects.map((sub, i) => (
           <motion.div
             key={sub.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`relative group bg-space-900/50 backdrop-blur-sm border rounded-2xl p-6 transition-all hover:-translate-y-1 ${
+            className={`relative group bg-space-900/50 backdrop-blur-sm border rounded-xl lg:rounded-2xl p-4 lg:p-6 transition-all hover:-translate-y-1 ${
               sub.score >= 80 ? 'border-neon-green/30 hover:border-neon-green' : 
               sub.score < 60 ? 'border-red-500/30 hover:border-red-500' : 
               'border-space-800 hover:border-neon-blue'
             }`}
           >
             {/* Trend Indicator */}
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-3 lg:top-4 right-3 lg:right-4">
               {sub.status === 'up' && (
-                <div className="flex items-center gap-1 text-neon-green bg-neon-green/10 px-2 py-1 rounded text-xs font-bold">
+                <div className="flex items-center gap-1 text-neon-green bg-neon-green/10 px-2 py-1 rounded text-[10px] lg:text-xs font-bold">
                   <TrendingUp className="w-3 h-3" />
                   +{sub.score - sub.prev}
                 </div>
               )}
               {sub.status === 'down' && (
-                <div className="flex items-center gap-1 text-red-400 bg-red-400/10 px-2 py-1 rounded text-xs font-bold">
+                <div className="flex items-center gap-1 text-red-400 bg-red-400/10 px-2 py-1 rounded text-[10px] lg:text-xs font-bold">
                   <TrendingDown className="w-3 h-3" />
                   {sub.score - sub.prev}
                 </div>
               )}
               {sub.status === 'stable' && (
-                <div className="flex items-center gap-1 text-slate-400 bg-space-800 px-2 py-1 rounded text-xs font-bold">
+                <div className="flex items-center gap-1 text-slate-400 bg-space-800 px-2 py-1 rounded text-[10px] lg:text-xs font-bold">
                   <Minus className="w-3 h-3" />
                   -
                 </div>
               )}
             </div>
 
-            <div className="mb-4">
-              <h4 className="text-slate-400 text-sm font-medium mb-1">{sub.name}</h4>
+            <div className="mb-3 lg:mb-4">
+              <h4 className="text-slate-400 text-xs lg:text-sm font-medium mb-1">{sub.name}</h4>
               <div className="flex items-baseline gap-2">
-                <span className={`text-3xl font-bold font-mono ${
+                <span className={`text-2xl lg:text-3xl font-bold font-mono ${
                   sub.score >= 80 ? 'text-neon-green' : 
                   sub.score < 60 ? 'text-red-500' : 
                   'text-white'
                 }`}>
                   {sub.score}
                 </span>
-                <span className="text-xs text-slate-500">/ {sub.full}</span>
+                <span className="text-[10px] lg:text-xs text-slate-500">/ {sub.full}</span>
               </div>
             </div>
 
             {/* Rank Bar */}
-            <div className="mb-4">
-               <div className="flex justify-between text-xs text-slate-500 mb-1">
+            <div className="mb-3 lg:mb-4">
+               <div className="flex justify-between text-[10px] lg:text-xs text-slate-500 mb-1">
                  <span>班级排名</span>
                  <span>Top {Math.round((sub.rank / 47) * 100)}%</span>
                </div>
@@ -156,9 +157,10 @@ export function Academics() {
             </div>
 
             {/* AI Comment */}
-            <div className="bg-space-800/50 rounded-lg p-3 text-xs leading-relaxed text-slate-300 border border-space-700/50 flex gap-2">
-              <Sparkles className="w-4 h-4 text-neon-yellow shrink-0 mt-0.5" />
-              {sub.comment}
+            <div className="bg-space-800/50 rounded-lg p-2 lg:p-3 text-[10px] lg:text-xs leading-relaxed text-slate-300 border border-space-700/50 flex gap-2">
+              <Sparkles className="w-3 h-3 lg:w-4 lg:h-4 text-neon-yellow shrink-0 mt-0.5" />
+              <span className="hidden sm:inline">{sub.comment}</span>
+              <span className="sm:hidden">{sub.comment.slice(0, 20)}...</span>
             </div>
           </motion.div>
         ))}

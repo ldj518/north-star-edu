@@ -25,21 +25,21 @@ const sourceData = [
 const StatCard = ({ title, value, sub, icon: Icon, color }: any) => (
   <motion.div 
     whileHover={{ y: -5 }}
-    className="bg-space-900/50 backdrop-blur-sm p-6 rounded-2xl border border-space-800 relative overflow-hidden group"
+    className="bg-space-900/50 backdrop-blur-sm p-4 lg:p-6 rounded-xl lg:rounded-2xl border border-space-800 relative overflow-hidden group"
   >
-    <div className={`absolute -right-4 -top-4 w-24 h-24 bg-${color}-500/10 rounded-full blur-2xl group-hover:bg-${color}-500/20 transition-all`} />
+    <div className={`absolute -right-4 -top-4 w-16 lg:w-24 h-16 lg:h-24 bg-${color}-500/10 rounded-full blur-2xl group-hover:bg-${color}-500/20 transition-all`} />
     
-    <div className="flex justify-between items-start mb-4">
-      <div>
-        <h3 className="text-slate-400 text-sm font-medium">{title}</h3>
-        <div className="text-3xl font-bold text-white mt-1">{value}</div>
+    <div className="flex justify-between items-start mb-3 lg:mb-4">
+      <div className="flex-1">
+        <h3 className="text-slate-400 text-xs lg:text-sm font-medium">{title}</h3>
+        <div className="text-2xl lg:text-3xl font-bold text-white mt-1">{value}</div>
       </div>
-      <div className={`p-3 rounded-xl bg-${color}-500/10 text-${color}-500`}>
-        <Icon className="w-6 h-6" />
+      <div className={`p-2 lg:p-3 rounded-xl bg-${color}-500/10 text-${color}-500`}>
+        <Icon className="w-5 h-5 lg:w-6 lg:h-6" />
       </div>
     </div>
     
-    <div className="text-xs text-slate-500 font-medium">
+    <div className="text-[10px] lg:text-xs text-slate-500 font-medium">
       {sub}
     </div>
   </motion.div>
@@ -55,16 +55,24 @@ export function Dashboard() {
   const progress = Math.min(100, (coins / targetReward.cost) * 100);
 
   return (
-    <div className="space-y-8">
-      {/* Boss Battle & Motivation - New Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Boss Card takes 1 col */}
+    <div className="space-y-6 lg:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+        <div>
+          <h2 className="text-2xl lg:text-3xl font-bold mb-2">战况室 Dashboard</h2>
+          <p className="text-slate-400 text-sm lg:text-base">欢迎回来，领航员！今日表现优异，继续加油！</p>
+        </div>
+      </div>
+
+      {/* Boss Battle & Motivation */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Boss Card */}
         <div className="lg:col-span-1">
            <BossBattleCard />
         </div>
         
-        {/* Motivation Zone takes 2 cols */}
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Motivation Zone */}
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
           {/* ... existing motivation cards ... */}
           {/* 1. Reward Proximity */}
           <motion.div 

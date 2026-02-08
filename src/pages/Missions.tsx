@@ -63,50 +63,53 @@ export function Missions() {
         </button>
       </div>
 
-      <div className="flex-1 grid grid-cols-12 gap-6 min-h-0">
-        {/* Task Pool */}
-        <div className="col-span-3 bg-space-900/50 backdrop-blur-sm rounded-2xl border border-space-800 p-4 flex flex-col">
-          <h3 className="font-bold text-slate-300 mb-4 flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-slate-500" />
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 min-h-0">
+        {/* Task Pool - Mobile: top section, Desktop: left sidebar */}
+        <div className="lg:col-span-3 bg-space-900/50 backdrop-blur-sm rounded-2xl border border-space-800 p-3 lg:p-4 flex flex-col lg:max-h-[calc(100vh-180px)]">
+          <h3 className="font-bold text-slate-300 mb-3 lg:mb-4 flex items-center gap-2 text-sm lg:text-base">
+            <CalendarIcon className="w-4 h-4 lg:w-5 lg:h-5 text-slate-500" />
             待排期作业
           </h3>
-          <div className="flex-1 overflow-y-auto space-y-3 min-h-[200px]">
+          <div className="flex-1 overflow-y-auto space-y-2 lg:space-y-3 min-h-[120px] lg:min-h-[200px] max-h-[200px] lg:max-h-none">
             {poolTasks.map(task => (
-              <div key={task.id} onClick={() => handleStartTask(task)}>
+              <div key={task.id} onClick={() => handleStartTask(task)} className="cursor-pointer">
                 <TaskCard task={task} />
               </div>
             ))}
             {poolTasks.length === 0 && (
-              <div className="text-center text-slate-600 py-10 text-sm border-2 border-dashed border-space-800 rounded-xl">
+              <div className="text-center text-slate-600 py-6 lg:py-10 text-xs lg:text-sm border-2 border-dashed border-space-800 rounded-xl">
                 作业池空空如也<br/>任务已全部指派
               </div>
             )}
           </div>
         </div>
 
-        {/* Weekly Grid */}
-        <div className="col-span-9 grid grid-cols-7 gap-3">
-          {DAYS.map((day) => (
-            <div 
-              key={day}
-              className="bg-space-900/30 rounded-xl border border-space-800 flex flex-col overflow-hidden"
-            >
-              <div className={cn(
-                "p-3 text-center border-b border-space-800 font-medium text-sm",
-                day === 'Tuesday' ? "bg-neon-blue/10 text-neon-blue" : "text-slate-400"
-              )}>
-                {day}
+        {/* Weekly Grid - Mobile: horizontal scroll, Desktop: 7 columns */}
+        <div className="lg:col-span-9 overflow-x-auto -mx-3 px-3 lg:mx-0 lg:px-0">
+          <div className="flex lg:grid lg:grid-cols-7 gap-2 lg:gap-3 min-w-max lg:min-w-0 pb-2 lg:pb-0">
+            {DAYS.map((day) => (
+              <div 
+                key={day}
+                className="bg-space-900/30 rounded-xl border border-space-800 flex flex-col overflow-hidden w-[85px] lg:w-auto flex-shrink-0"
+              >
+                <div className={cn(
+                  "p-2 lg:p-3 text-center border-b border-space-800 font-medium text-xs lg:text-sm",
+                  day === 'Tuesday' ? "bg-neon-blue/10 text-neon-blue" : "text-slate-400"
+                )}>
+                  <div className="hidden lg:block">{day}</div>
+                  <div className="lg:hidden">{day.slice(0, 3)}</div>
+                </div>
+                
+                <div className="flex-1 p-1.5 lg:p-2 space-y-1.5 lg:space-y-2 min-h-[250px] lg:min-h-[400px]">
+                  {getTasksForDay(day).map((task) => (
+                    <div key={task.id} onClick={() => handleStartTask(task)} className="cursor-pointer">
+                      <TaskCard task={task} compact />
+                    </div>
+                  ))}
+                </div>
               </div>
-              
-              <div className="flex-1 p-2 space-y-2 min-h-[400px]">
-                {getTasksForDay(day).map((task) => (
-                  <div key={task.id} onClick={() => handleStartTask(task)}>
-                    <TaskCard task={task} compact />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
