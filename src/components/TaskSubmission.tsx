@@ -36,8 +36,51 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
   };
 
   const analyzeImage = async (imageData: string) => {
+    console.log('开始分析图片...');
+    console.log('图片大小:', Math.round(imageData.length / 1024), 'KB');
+    
+    // Demo mode: Use mock result for testing
+    const useDemoMode = true; // Set to false to use real API
+    
+    if (useDemoMode) {
+      console.log('使用演示模式（模拟 AI 批改）');
+      
+      const demoResult: AnalysisResult = {
+        overall_score: 78,
+        issues: [
+          {
+            type: 'error',
+            question_number: 3,
+            description: '第3题：三角形面积计算时忘记除以2',
+            position: { x: 25, y: 35 }
+          },
+          {
+            type: 'warning',
+            question_number: 5,
+            description: '第5题：解题步骤不够完整',
+            position: { x: 60, y: 55 }
+          }
+        ],
+        encouragements: [
+          '整体完成度不错！',
+          '前两题完全正确，继续保持！',
+          '字迹清晰，卷面整洁！'
+        ],
+        socratic_prompt: '让我们看看第3题。你计算出的面积是30，但看看三角形面积公式，是不是哪里漏了一步？'
+      };
+
+      console.log('演示分析结果:', demoResult);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      
+      setAnalysisResult(demoResult);
+      setStep('review');
+      return;
+    }
+    
+    // Real API mode
     try {
-      // Call real AI API for homework grading
       const response = await fetch('/api/oracle/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,11 +93,17 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
         })
       });
 
-      if (!response.ok) throw new Error('API request failed');
+      console.log('API响应状态:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API错误:', errorData);
+        throw new Error(errorData.error || 'API request failed');
+      }
 
       const data = await response.json();
+      console.log('API返回数据:', data);
       
-      // Parse AI response into structured result
       const result: AnalysisResult = {
         overall_score: 85,
         issues: [
@@ -65,23 +114,43 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
             position: { x: 30, y: 40 }
           }
         ],
-        encouragements: [
-          '字迹很工整！',
-          '大部分题目都做对了！'
-        ],
+        encouragements: ['字迹很工整！', '大部分题目都做对了！'],
         socratic_prompt: data.reply || '让我看看第3题，你用了什么公式？'
       };
 
+      console.log('分析结果:', result);
       setAnalysisResult(result);
       
       setTimeout(() => {
-        setStep(result.issues.length > 0 ? 'review' : 'success');
-      }, 2000);
+        if (result.issues.length > 0) {
+          setStep('review');
+        } else {
+          setStep('success');
+        }
+      }, 1500);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis error:', error);
-      // Fallback to mock result
-      setTimeout(() => setStep('review'), 2000);
+      
+      // Show error to user and provide demo
+      alert(`AI 批改失败：${error.message}\n\n将使用演示模式继续体验流程。`);
+      
+      const fallbackResult: AnalysisResult = {
+        overall_score: 80,
+        issues: [
+          {
+            type: 'error',
+            question_number: 3,
+            description: '发现需要改进的地方',
+            position: { x: 30, y: 40 }
+          }
+        ],
+        encouragements: ['继续加油！'],
+        socratic_prompt: '这道题的思路是什么？'
+      };
+      
+      setAnalysisResult(fallbackResult);
+      setTimeout(() => setStep('review'), 1000);
     }
   };
 
@@ -126,9 +195,29 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
   };
 
   const startCamera = async () => {
+    // Check if mediaDevices is supported
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('您的浏览器不支持摄像头访问，请使用本地上传或尝试其他浏览器（如 Chrome）');
+      return;
+    }
+
+    // Check if HTTPS or localhost
+    const isSecure = window.location.protocol === 'https:' || 
+                     window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1';
+    
+    if (!isSecure) {
+      alert('摄像头访问需要 HTTPS 环境。当前是 HTTP，无法使用摄像头。\n\n请使用"本地上传"功能，或在 HTTPS 环境下访问。');
+      return;
+    }
+
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' },
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
         audio: false 
       });
       setStream(mediaStream);
@@ -136,10 +225,17 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Camera error:', error);
-      alert('无法访问摄像头，请使用本地上传');
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        alert('摄像头访问被拒绝。\n\n请：\n1. 点击浏览器地址栏的锁图标\n2. 允许"摄像头"权限\n3. 刷新页面重试\n\n或使用"本地上传"功能。');
+      } else if (error.name === 'NotFoundError') {
+        alert('未检测到摄像头设备。\n\n请确认您的设备有摄像头，或使用"本地上传"功能。');
+      } else {
+        alert(`无法访问摄像头：${error.message || error}\n\n请使用"本地上传"功能。`);
+      }
     }
   };
 
@@ -243,19 +339,34 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
 // 2. Analyzing Step - Real AI Processing
 function AnalyzingStep({ image }: { image: string }) {
   const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('初始化...');
 
   useEffect(() => {
+    const stages = [
+      { progress: 20, status: '上传图片...' },
+      { progress: 40, status: '识别内容...' },
+      { progress: 60, status: '分析答案...' },
+      { progress: 80, status: 'AI 批改中...' },
+      { progress: 100, status: '生成报告...' }
+    ];
+
+    let currentStage = 0;
     const interval = setInterval(() => {
-      setProgress(prev => Math.min(100, prev + 10));
-    }, 300);
+      if (currentStage < stages.length) {
+        setProgress(stages[currentStage].progress);
+        setStatus(stages[currentStage].status);
+        currentStage++;
+      }
+    }, 800);
+    
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="w-full h-full relative">
-      <img src={image} alt="Task" className="w-full h-full object-cover opacity-50" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="relative">
+      <img src={image} alt="Task" className="w-full h-full object-cover opacity-30" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="relative mb-8">
           <ScanLine className="w-24 h-24 text-neon-blue animate-pulse" />
           <motion.div 
             initial={{ top: 0 }}
@@ -264,34 +375,21 @@ function AnalyzingStep({ image }: { image: string }) {
             className="absolute left-0 right-0 h-1 bg-neon-blue shadow-[0_0_15px_#3b82f6]"
           />
         </div>
-        <h3 className="text-xl font-bold text-white mt-6 mb-2">AI 智能批改中...</h3>
-        <div className="w-64 bg-space-800 rounded-full h-2 mb-4">
+        
+        <h3 className="text-2xl font-bold text-white mb-3">AI 智能批改中...</h3>
+        <p className="text-neon-blue mb-6">{status}</p>
+        
+        <div className="w-64 bg-space-800 rounded-full h-3 mb-6 overflow-hidden">
           <motion.div 
-            className="h-full bg-neon-blue rounded-full"
+            className="h-full bg-gradient-to-r from-neon-blue to-neon-purple rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5 }}
           />
         </div>
-        <div className="flex flex-col gap-2 text-sm text-slate-300 w-64">
-          <div className="flex justify-between">
-            <span>图片识别</span>
-            <span className={progress > 30 ? "text-neon-green" : "text-neon-yellow"}>
-              {progress > 30 ? "完成 ✅" : "计算中..."}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>字迹分析</span>
-            <span className={progress > 60 ? "text-neon-green" : "text-neon-yellow"}>
-              {progress > 60 ? "完成 ✅" : "计算中..."}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>答案批改</span>
-            <span className={progress > 90 ? "text-neon-green" : "text-neon-yellow flex items-center gap-1"}>
-              {progress > 90 ? "完成 ✅" : <Loader2 className="w-3 h-3 animate-spin" />}
-            </span>
-          </div>
+        
+        <div className="text-sm text-slate-400">
+          进度: {progress}%
         </div>
       </div>
     </div>
