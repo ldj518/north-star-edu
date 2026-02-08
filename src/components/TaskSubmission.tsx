@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, Loader2, User } from 'lucide-react';
+import { Camera, Upload, CheckCircle2, AlertTriangle, X, Send, Bot, ScanLine, User } from 'lucide-react';
 import type { Task } from '../store/useStore';
 import { cn } from '../lib/utils';
 
@@ -30,6 +30,7 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const handleImageSelect = (imageData: string) => {
+    console.log('📸 图片已选择，大小:', Math.round(imageData.length / 1024), 'KB');
     setImage(imageData);
     setStep('analyzing');
     analyzeImage(imageData);
@@ -37,7 +38,6 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
 
   const analyzeImage = async (imageData: string) => {
     console.log('🔍 开始分析图片...');
-    console.log('📁 图片大小:', Math.round(imageData.length / 1024), 'KB');
     
     // Try real API first
     console.log('🤖 尝试调用真实 AI API...');
@@ -90,7 +90,7 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
       console.log('❌ API调用异常，使用演示模式:', error);
     }
     
-    // Demo mode fallback (when API fails)
+    // Demo mode fallback
     console.log('🎭 使用演示模式（Fallback）');
     
     const demoResult: AnalysisResult = {
@@ -140,7 +140,7 @@ export function TaskSubmission({ task, onClose, onComplete }: TaskSubmissionProp
   );
 }
 
-// 1. Upload Step - Real File Upload & Camera
+// 1. Upload Step - Enhanced Camera
 function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -159,46 +159,115 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
   };
 
   const startCamera = async () => {
+    console.log('🎥 尝试启动摄像头...');
+
     // Check if mediaDevices is supported
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('您的浏览器不支持摄像头访问，请使用本地上传或尝试其他浏览器（如 Chrome）');
+      console.error('❌ 浏览器不支持 mediaDevices');
+      alert('❌ 您的浏览器不支持摄像头访问\n\n建议：\n✓ 使用 Chrome、Edge 或 Firefox 浏览器\n✓ 使用"本地上传"功能（推荐）');
       return;
     }
 
     // Check if HTTPS or localhost
-    const isSecure = window.location.protocol === 'https:' || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1';
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' ||
+                    window.location.hostname.startsWith('192.168.') ||
+                    window.location.hostname.startsWith('10.') ||
+                    window.location.hostname.startsWith('172.');
+    
+    const isSecure = window.location.protocol === 'https:' || isLocal;
+    
+    console.log('🔒 安全检查:', {
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      isLocal,
+      isSecure
+    });
     
     if (!isSecure) {
-      alert('摄像头访问需要 HTTPS 环境。当前是 HTTP，无法使用摄像头。\n\n请使用"本地上传"功能，或在 HTTPS 环境下访问。');
+      console.error('❌ 非 HTTPS 环境');
+      alert('❌ 安全限制：摄像头需要 HTTPS 环境\n\n当前网站使用 HTTP，浏览器阻止了摄像头访问。\n\n✅ 解决方案：\n• 使用"本地上传"功能（更稳定可靠）\n• 在本地 localhost 环境测试\n• 部署到 HTTPS 服务器\n\n注意：Cloudflare Pages 已是 HTTPS，如果您看到此消息，请检查网址是否以 https:// 开头');
       return;
     }
 
     try {
+      // Show loading overlay
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'camera-loading-overlay';
+      loadingDiv.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm';
+      loadingDiv.innerHTML = `
+        <div class="text-center text-white p-8">
+          <div class="animate-spin w-16 h-16 border-4 border-neon-blue border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p class="text-xl font-bold mb-2">正在启动摄像头...</p>
+          <p class="text-sm text-slate-400 mb-4">请在浏览器弹窗中点击"允许"</p>
+          <div class="mt-6 p-4 bg-space-800 rounded-lg text-left text-sm max-w-md mx-auto">
+            <p class="text-neon-yellow mb-2">💡 浏览器权限请求：</p>
+            <p class="text-slate-300">• 点击地址栏左侧的 🔒 或 ⚠️ 图标</p>
+            <p class="text-slate-300">• 找到"摄像头"或"相机"权限</p>
+            <p class="text-slate-300">• 选择"允许"</p>
+            <p class="text-slate-300">• 刷新页面后重试</p>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(loadingDiv);
+
+      console.log('📡 请求摄像头权限...');
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          facingMode: 'user', // 使用前置摄像头更可靠
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         },
         audio: false 
       });
+
+      console.log('✅ 摄像头权限已获取');
+      
+      // Remove loading overlay
+      document.getElementById('camera-loading-overlay')?.remove();
+
       setStream(mediaStream);
       setShowCamera(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          console.log('✅ 摄像头已启动:', {
+            width: videoRef.current?.videoWidth,
+            height: videoRef.current?.videoHeight
+          });
+          
+          videoRef.current?.play().catch(e => {
+            console.error('❌ 播放失败:', e);
+          });
+        };
+        
+        // Handle errors during playback
+        videoRef.current.onerror = (e) => {
+          console.error('❌ 视频播放错误:', e);
+        };
       }
     } catch (error: any) {
-      console.error('Camera error:', error);
+      // Remove loading overlay if exists
+      document.getElementById('camera-loading-overlay')?.remove();
+
+      console.error('❌ 摄像头启动失败:', {
+        name: error.name,
+        message: error.message
+      });
+      
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        alert('摄像头访问被拒绝。\n\n请：\n1. 点击浏览器地址栏的锁图标\n2. 允许"摄像头"权限\n3. 刷新页面重试\n\n或使用"本地上传"功能。');
+        alert('❌ 摄像头权限被拒绝\n\n📋 解决方法：\n\n1️⃣ 点击浏览器地址栏左侧的🔒或⚠️图标\n2️⃣ 找到"摄像头"或"相机"权限\n3️⃣ 选择"允许"\n4️⃣ 刷新页面后重试\n\n💡 提示：使用"本地上传"功能更简单稳定！');
       } else if (error.name === 'NotFoundError') {
-        alert('未检测到摄像头设备。\n\n请确认您的设备有摄像头，或使用"本地上传"功能。');
+        alert('❌ 未检测到摄像头\n\n请确认：\n• 设备有摄像头硬件\n• 摄像头未被其他应用占用\n• 或使用"本地上传"功能');
+      } else if (error.name === 'NotReadableError') {
+        alert('❌ 摄像头无法读取\n\n可能原因：\n• 摄像头被其他应用占用\n• 硬件驱动问题\n\n建议：\n• 关闭其他使用摄像头的应用\n• 重启浏览器\n• 或使用"本上传"功能');
+      } else if (error.name === 'OverconstrainedError') {
+        alert('❌ 摄像头不符合要求\n\n可能原因：\n• 摄像头分辨率不支持\n\n建议：使用"本上传"功能');
       } else {
-        alert(`无法访问摄像头：${error.message || error}\n\n请使用"本地上传"功能。`);
+        alert(`❌ 无法访问摄像头\n\n错误信息: ${error.message || '未知错误'}\n错误类型: ${error.name}\n\n建议：使用"本上传"功能更稳定可靠！`);
       }
     }
   };
@@ -233,6 +302,7 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
           ref={videoRef}
           autoPlay 
           playsInline
+          muted
           className="w-full h-full object-cover"
         />
         
@@ -300,7 +370,7 @@ function UploadStep({ onImageSelect }: { onImageSelect: (image: string) => void 
   );
 }
 
-// 2. Analyzing Step - Real AI Processing
+// 2. Analyzing Step
 function AnalyzingStep({ image }: { image: string }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('初始化...');
@@ -324,7 +394,7 @@ function AnalyzingStep({ image }: { image: string }) {
       }
     }, 800);
     
-    // Check if using demo mode (no API key configured)
+    // Check if using demo mode
     const checkApiStatus = async () => {
       try {
         const response = await fetch('/api/health');
@@ -333,7 +403,6 @@ function AnalyzingStep({ image }: { image: string }) {
           setUsingDemo(true);
         }
       } catch (e) {
-        // Assume demo mode if health check fails
         setUsingDemo(true);
       }
     };
@@ -382,14 +451,6 @@ function AnalyzingStep({ image }: { image: string }) {
             <p className="text-xs text-slate-400">
               未检测到 API Key 配置，正在使用演示模式。
             </p>
-            <a 
-              href="https://docs.openclaw.ai" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-neon-blue hover:underline mt-2 inline-block"
-            >
-              如何配置真实 AI →
-            </a>
           </div>
         )}
       </div>
@@ -484,7 +545,7 @@ function ReviewStep({ image, result, onFix }: {
   );
 }
 
-// 4. Socratic Step - Real AI Chat
+// 4. Socratic Step
 function SocraticStep({ image, task, result, onFinish }: { 
   image: string; 
   task: Task;
@@ -494,18 +555,11 @@ function SocraticStep({ image, task, result, onFinish }: {
   const [messages, setMessages] = useState<Array<{role: 'ai' | 'user', content: string}>>([
     { 
       role: 'ai', 
-      content: result.socratic_prompt || '让我看看这道题。你的思路是什么？' 
+      content: result.socratic_prompt || '让我们看看这道题。你的思路是什么？' 
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -516,7 +570,6 @@ function SocraticStep({ image, task, result, onFinish }: {
     setIsLoading(true);
 
     try {
-      // Call AI API for Socratic guidance
       const response = await fetch('/api/oracle/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -526,18 +579,22 @@ function SocraticStep({ image, task, result, onFinish }: {
           studentName: '路则昊',
           context: 'socratic_guidance',
           taskTitle: task.title,
-          conversationHistory: messages.slice(-3)
+          conversationHistory: messages.slice(-4)
         })
       });
 
-      if (!response.ok) throw new Error('API request failed');
-
-      const data = await response.json();
-      
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        content: data.reply || '很好，继续思考...' 
-      }]);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(prev => [...prev, { 
+          role: 'ai', 
+          content: data.reply || '很好，继续思考...' 
+        }]);
+      } else {
+        setMessages(prev => [...prev, { 
+          role: 'ai', 
+          content: '抱歉，我现在无法回应。请稍后再试。' 
+        }]);
+      }
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, { 
@@ -583,10 +640,7 @@ function SocraticStep({ image, task, result, onFinish }: {
           </div>
         </div>
 
-        <div 
-          ref={chatContainerRef}
-          className="flex-1 overflow-y-auto p-6 space-y-6"
-        >
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.map((msg, idx) => (
             <motion.div 
               key={idx}
@@ -651,7 +705,7 @@ function SocraticStep({ image, task, result, onFinish }: {
                 disabled={isLoading || !input.trim()}
                 className="bg-neon-purple hover:bg-neon-purple/80 text-white p-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                {isLoading ? <ScanLine className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
               </button>
             </div>
           )}
